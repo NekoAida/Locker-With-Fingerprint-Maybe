@@ -17,7 +17,9 @@ void setup() {
       Serial.print(i);
       Serial.println("!");
     } else {
-      Serial.println("Did not find fingerprint sensor 1 :(");
+      Serial.print("Did not find fingerprint sensor ");
+      Serial.print(i);
+      Serial.println(" :(");
       while (1);
     }
   }
@@ -47,7 +49,7 @@ void loop() {
     Serial.println("Fingerprint ID should be in range 1 - 127. Try again.");
     return;
   }
-  if (enrollFingerprint(sid, fid))
+  if (enrollFingerprint(sid - 1, fid))
     Serial.println("Fingerprint successfully enrolled in both sensors!");
   else
     Serial.println("Enrollment failed. Try again.");
@@ -55,7 +57,7 @@ void loop() {
 
 bool enrollFingerprint(uint8_t sid, uint8_t fid) {
   Serial.println("Waiting for valid finger to enroll.");
-  while (finger[sid].getImage() != FINGERPRINT_OK);
+  while (finger[sid].getImage() != FINGERPRINT_OK) Serial.print(".");
   if (finger[sid].image2Tz(1) != FINGERPRINT_OK) {
     Serial.println("Failed to process image.");
     return false;
