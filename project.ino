@@ -14,7 +14,7 @@ Adafruit_Fingerprint finger2(&fingerSerial2);
 const int locker1RelayPin = 8;
 const int locker2RelayPin = 9;
 
-// ตั้งค่า LCD Address ที่ตรวจพบคือ 0x3F
+// ตั้งค่า LCD Address
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
 
 void setup() {
@@ -42,10 +42,10 @@ void setup() {
     Serial.println("Fingerprint 1 failed!");
     lcd.setCursor(0, 1);
     lcd.print("Sensor 1 Failed");
-    while (1); // หยุดโปรแกรมหากเซ็นเซอร์ไม่พร้อม
+    while (1);
   }
 
-  delay(2000); // รอ 2 วินาที
+  delay(2000);
   lcd.clear();
 
   // เริ่มต้นเซ็นเซอร์ลายนิ้วมือ 2
@@ -58,10 +58,10 @@ void setup() {
     Serial.println("Fingerprint 2 failed!");
     lcd.setCursor(0, 1);
     lcd.print("Sensor 2 Failed");
-    while (1); // หยุดโปรแกรมหากเซ็นเซอร์ไม่พร้อม
+    while (1);
   }
 
-  delay(2000); // รอ 2 วินาที
+  delay(2000);
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Ready to Scan");
@@ -72,32 +72,36 @@ void loop() {
   lcd.print("Waiting Finger...");
 
   // ตรวจสอบเซ็นเซอร์ 1
-  int id1 = getFingerprintID(finger1);
-  if (id1 == 1) {
-    Serial.println("Locker 1 Unlocked!");
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Locker 1 Unlocked");
-    openLocker(locker1RelayPin);
-    delay(2000);
-  } else {
-    Serial.println("No match for Finger 1");
+  if (scanAndUnlock(finger1, locker1RelayPin, "Locker 1")) {
+    delay(2000); // รอให้ปลดล็อกก่อน
   }
 
   // ตรวจสอบเซ็นเซอร์ 2
-  int id2 = getFingerprintID(finger2);
-  if (id2 == 2) {
-    Serial.println("Locker 2 Unlocked!");
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Locker 2 Unlocked");
-    openLocker(locker2RelayPin);
-    delay(2000);
-  } else {
-    Serial.println("No match for Finger 2");
+  if (scanAndUnlock(finger2, locker2RelayPin, "Locker 2")) {
+    delay(2000); // รอให้ปลดล็อกก่อน
   }
 
   delay(1000); // รอ 1 วินาที
+}
+
+// ฟังก์ชันตรวจสอบและปลดล็อก
+bool scanAndUnlock(Adafruit_Fingerprint &finger, int relayPin, const char *lockerName) {
+  int id = getFingerprintID(finger);
+  if (id >= 0) {
+    Serial.print(lockerName);
+    Serial.println(" Unlocked!");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(lockerName);
+    lcd.setCursor(0, 1);
+    lcd.print("Unlocked");
+    openLocker(relayPin);
+    return true; // คืนค่า true ถ้าปลดล็อกสำเร็จ
+  } else {
+    Serial.print(lockerName);
+    Serial.println(": No match.");
+    return false; // คืนค่า false ถ้าหาลายนิ้วมือไม่เจอ
+  }
 }
 
 // ฟังก์ชันสแกนลายนิ้วมือ
