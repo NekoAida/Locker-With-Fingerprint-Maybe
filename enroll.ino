@@ -14,11 +14,11 @@ void setup() {
     finger[i].begin(57600);
     if (finger[i].verifyPassword()) {
       Serial.print("Found fingerprint sensor ");
-      Serial.print(i);
+      Serial.print(i + 1);
       Serial.println("!");
     } else {
       Serial.print("Did not find fingerprint sensor ");
-      Serial.print(i);
+      Serial.print(i + 1);
       Serial.println(" :(");
       while (1);
     }
