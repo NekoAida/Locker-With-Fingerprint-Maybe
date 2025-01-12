@@ -55,29 +55,29 @@ void loop() {
 
 bool enrollFingerprint(uint8_t sid, uint8_t fid) {
   Serial.println("Waiting for valid finger to enroll.");
-  while (finger.getImage() != FINGERPRINT_OK);
-  if (finger.image2Tz(1) != FINGERPRINT_OK) {
+  while (finger[sid].getImage() != FINGERPRINT_OK);
+  if (finger[sid].image2Tz(1) != FINGERPRINT_OK) {
     Serial.println("Failed to process image.");
     return false;
   }
 
   Serial.println("Remove finger");
   delay(1000);
-  while (finger.getImage() != FINGERPRINT_NOFINGER);
+  while (finger[sid].getImage() != FINGERPRINT_NOFINGER);
 
   Serial.println("Place the same finger again.");
-  while (finger.getImage() != FINGERPRINT_OK);
-  if (finger.image2Tz(2) != FINGERPRINT_OK) {
+  while (finger[sid].getImage() != FINGERPRINT_OK);
+  if (finger[sid].image2Tz(2) != FINGERPRINT_OK) {
     Serial.println("Failed to process second image.");
     return false;
   }
 
-  if (finger.createModel() != FINGERPRINT_OK) {
+  if (finger[sid].createModel() != FINGERPRINT_OK) {
     Serial.println("Fingerprints did not match.");
     return false;
   }
 
-  if (finger.storeModel(id) != FINGERPRINT_OK) {
+  if (finger[sid].storeModel(fid) != FINGERPRINT_OK) {
     Serial.println("Failed to store fingerprint.");
     return false;
   }
